@@ -18,11 +18,14 @@ package com.example.android.notificationchannels
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -53,37 +56,43 @@ class MainActivity : Activity() {
      */
     fun sendNotification(id: Int, title: String) {
         when (id) {
-            NOTI_PRIMARY1 -> helper.notify(
+            NOTI_PRIMARY1 -> helper.notifyPrimaryChannel(
                     id, helper.getNotification1(title, getString(R.string.primary1_body)))
-            NOTI_PRIMARY2 -> helper.notify(
+            NOTI_PRIMARY2 -> helper.notifyPrimaryChannel(
                     id, helper.getNotification1(title, getString(R.string.primary2_body)))
-            NOTI_SECONDARY1 -> helper.notify(
+            NOTI_SECONDARY1 -> helper.notifySecondaryChannel(
                     id, helper.getNotification2(title, getString(R.string.secondary1_body)))
-            NOTI_SECONDARY2 -> helper.notify(
+            NOTI_SECONDARY2 -> helper.notifySecondaryChannel(
                     id, helper.getNotification2(title, getString(R.string.secondary2_body)))
         }
     }
 
     /**
-     * Send Intent to load system Notification Settings for this app.
+     * Send Intent to load system Notification Settings for this app or a particular channel if
+     * provided
+     * @param channel optional name of channel to configure
      */
-    fun goToNotificationSettings() {
-        val i = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+    fun goToNotificationSettings(channel: String? = null) {
+
+        if(Build.VERSION.SDK_INT < 26){
+            Toast.makeText(this, "not supported for this os version", LENGTH_SHORT).show()
+            return
+        }
+
+        val i = Intent()
         i.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+
+        if(channel != null) {
+            i.action = Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS
+            i.putExtra(Settings.EXTRA_CHANNEL_ID, channel)
+        }
+        else{
+            i.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+        }
+
         startActivity(i)
     }
 
-    /**
-     * Send intent to load system Notification Settings UI for a particular channel.
-
-     * @param channel Name of channel to configure
-     */
-    fun goToNotificationSettings(channel: String) {
-        val i = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-        i.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-        i.putExtra(Settings.EXTRA_CHANNEL_ID, channel)
-        startActivity(i)
-    }
 
     /**
      * View model for interacting with Activity UI elements. (Keeps core logic for sample
