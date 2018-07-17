@@ -71,6 +71,7 @@ internal class NotificationHelper
         return NotificationCompat.Builder(applicationContext, PRIMARY_CHANNEL)
                 .setContentTitle(title)
                 .setContentText(body)
+                .setDefaults(Notification.DEFAULT_ALL)
                 .setSmallIcon(smallIcon)
                 .setAutoCancel(true)
     }
@@ -88,6 +89,7 @@ internal class NotificationHelper
         return NotificationCompat.Builder(applicationContext, SECONDARY_CHANNEL)
                 .setContentTitle(title)
                 .setContentText(body)
+                .setDefaults(Notification.DEFAULT_ALL)
                 .setSmallIcon(smallIcon)
                 .setAutoCancel(true)
     }
